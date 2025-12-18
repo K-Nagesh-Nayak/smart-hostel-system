@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , Link} from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -71,7 +71,7 @@ const Login = () => {
 
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account? <span className="text-blue-500 cursor-pointer">Register here</span>
+            Don't have an account? <span className="text-blue-500 cursor-pointer"><Link to="/register" className="text-blue-600 font-bold hover:underline">Register here</Link></span>
           </p>
         </div>
       </div>

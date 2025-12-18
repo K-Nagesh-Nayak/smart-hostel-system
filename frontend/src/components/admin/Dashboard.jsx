@@ -1,8 +1,12 @@
 import Layout from '../common/Layout';
 import UserManagement from './UserManagement';
 import GeoSettings from './GeoSettings';
-import NoticeBoard from './NoticeBoard'; // <-- Import
-import FeedbackAnalysis from './FeedbackAnalysis'; // <-- Import
+import NoticeBoard from './NoticeBoard';
+import FeedbackAnalysis from './FeedbackAnalysis';
+import IssueResolution from './IssueResolution';
+import AttendanceAnalytics from './AttendanceAnalytics';
+import VisitorManagement from './VisitorManagement'; // <-- Import Visitor Management
+import LeaveApproval from './LeaveApproval'; // <-- Import Leave Approval
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaUserPlus, FaUsers, FaUtensils, FaUserCheck, FaMapMarkedAlt, FaChartLine } from 'react-icons/fa';
@@ -45,11 +49,13 @@ const AdminDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-center border-b pb-4 gap-4">
           <h1 className="text-3xl font-bold text-gray-800">Admin Command Center</h1>
           <div className="bg-gray-100 p-1 rounded-lg flex flex-wrap gap-1">
-            {['overview', 'users', 'map', 'communication'].map(tab => (
+            {['overview', 'users', 'visitors', 'leaves', 'analytics', 'map', 'communication', 'issues'].map(tab => (
                 <button 
                     key={tab}
                     onClick={() => setActiveTab(tab)} 
-                    className={`px-4 py-2 rounded-md font-bold capitalize transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}
+                    className={`px-3 py-2 rounded-md font-bold capitalize transition-all text-xs md:text-sm ${
+                        activeTab === tab ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'
+                    }`}
                 >
                     {tab}
                 </button>
@@ -126,7 +132,7 @@ const AdminDashboard = () => {
                     <h3 className="text-lg font-bold text-red-600 mb-4">🔴 Absent Today</h3>
                     <div className="overflow-y-auto max-h-64 space-y-2 pr-2">
                         {stats.absentees.length === 0 ? <p className="text-green-600 font-bold text-center">Everyone Present!</p> : stats.absentees.map(s => (
-                            <div key={s._id} className="p-3 bg-red-50 rounded border border-red-100 flex justify-between"><span className="font-bold">{s.name}</span><span className="text-xs bg-white px-2 py-1 rounded">Room {s.room}</span></div>
+                            <div key={s._id} className="p-3 bg-red-50 rounded border border-red-100 flex justify-between"><span className="font-bold">{s.name}</span><span className="text-xs bg-white px-2 py-1 rounded">Room {s.room || 'N/A'}</span></div>
                         ))}
                     </div>
                 </div>
@@ -137,14 +143,38 @@ const AdminDashboard = () => {
         {/* --- VIEW 2: USERS --- */}
         {activeTab === 'users' && <UserManagement />}
 
-        {/* --- VIEW 3: GEO MAP --- */}
+        {/* --- VIEW 3: VISITORS (New) --- */}
+        {activeTab === 'visitors' && (
+            <div className="h-[600px]">
+                <VisitorManagement />
+            </div>
+        )}
+
+        {/* --- VIEW 4: LEAVES (New) --- */}
+        {activeTab === 'leaves' && (
+            <div className="h-[600px]">
+                <LeaveApproval />
+            </div>
+        )}
+
+        {/* --- VIEW 5: ANALYTICS --- */}
+        {activeTab === 'analytics' && <AttendanceAnalytics />}
+
+        {/* --- VIEW 6: GEO MAP --- */}
         {activeTab === 'map' && <div className="h-[600px]"><GeoSettings /></div>}
 
-        {/* --- VIEW 4: COMMUNICATION (NEW) --- */}
+        {/* --- VIEW 7: COMMUNICATION --- */}
         {activeTab === 'communication' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[600px]">
                 <NoticeBoard />
                 <FeedbackAnalysis />
+            </div>
+        )}
+
+        {/* --- VIEW 8: ISSUE TRACKER --- */}
+        {activeTab === 'issues' && (
+            <div className="h-[600px]">
+                <IssueResolution />
             </div>
         )}
 

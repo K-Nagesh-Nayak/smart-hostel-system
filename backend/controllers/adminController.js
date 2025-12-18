@@ -15,14 +15,14 @@ export const getDashboardStats = async (req, res) => {
     const mealBookings = await Booking.countDocuments({ date: today, status: 'booked' });
     const presentCount = await Attendance.countDocuments({ date: today, status: 'present' });
 
-    // 2. Identify Absentees (Students who are approved but NOT in attendance today)
+    // 2. Identify Absentees
     const allStudents = await User.find({ role: 'student', approved: true }).select('_id name room');
     const presentRecords = await Attendance.find({ date: today }).select('studentId');
     const presentIds = presentRecords.map(p => p.studentId.toString());
 
     const absentees = allStudents.filter(s => !presentIds.includes(s._id.toString()));
 
-    // 3. Attendance Trend (Last 7 Days) for Graphs
+    // 3. Attendance Trend (Last 7 Days)
     const last7Days = [];
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
@@ -37,7 +37,7 @@ export const getDashboardStats = async (req, res) => {
       mealBookings,
       presentCount,
       absentCount: absentees.length,
-      absentees, // Send list of names/rooms
+      absentees, 
       attendanceTrend: last7Days
     });
   } catch (error) {
@@ -72,6 +72,42 @@ export const addStudent = async (req, res) => {
   }
 };
 
+// @desc    Update Student Details (Admin)
+// @route   PUT /api/admin/users/:id
+export const updateUser = async (req, res) => {
+  const { name, room, phone } = req.body;
+  
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.name = name || user.name;
+    user.room = room || user.room;
+    user.phone = phone || user.phone;
+
+    const updatedUser = await user.save();
+    res.json({ message: 'User updated', user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Revoke User Access (Set approved=false)
+// @route   PATCH /api/admin/users/:id/revoke
+export const revokeUserAccess = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.approved = false;
+    await user.save();
+    
+    res.json({ message: 'Access revoked successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get Geolocation Settings
 // @route   GET /api/admin/settings/geo
 export const getGeoSettings = async (req, res) => {
@@ -92,7 +128,6 @@ export const getGeoSettings = async (req, res) => {
 export const updateGeoSettings = async (req, res) => {
   const { lat, lng, radius } = req.body;
   try {
-    // Create new setting record (Version history style)
     await SystemSettings.create({
         hostelLocation: { lat, lng, radius },
         updatedBy: req.user._id

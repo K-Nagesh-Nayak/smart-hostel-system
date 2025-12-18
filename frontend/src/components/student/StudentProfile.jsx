@@ -55,6 +55,7 @@ const StudentProfile = () => {
                 <div>
                     <p className="text-xs text-gray-500 uppercase font-bold">Room Number</p>
                     <p className="font-medium text-gray-800">{user?.room || 'Not Assigned'}</p>
+                     {console.log(user)}
                 </div>
             </div>
             <div className="flex items-center gap-4 p-3 bg-gray-50 rounded">

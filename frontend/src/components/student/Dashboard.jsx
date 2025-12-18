@@ -6,7 +6,9 @@ import QRCodeTicket from './QRCodeTicket';
 import FeedbackForm from './FeedbackForm';
 import StudentProfile from './StudentProfile';
 import StudentNoticeBoard from './StudentNoticeBoard';
-import { FaHome, FaUtensils, FaBullhorn, FaUser } from 'react-icons/fa';
+import RoomHub from './RoomHub';
+import LeaveRequest from './LeaveRequest'; // <-- Import the LeaveRequest component
+import { FaHome, FaUtensils, FaBullhorn, FaUser, FaBuilding, FaSuitcase } from 'react-icons/fa';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -36,6 +38,8 @@ const StudentDashboard = () => {
           <div className="flex flex-wrap gap-2 bg-gray-100 p-2 rounded-xl">
             <NavButton id="dashboard" label="Overview" icon={<FaHome />} />
             <NavButton id="meals" label="Meals" icon={<FaUtensils />} />
+            <NavButton id="room" label="My Room" icon={<FaBuilding />} />
+            <NavButton id="leaves" label="Leaves" icon={<FaSuitcase />} /> {/* New Tab */}
             <NavButton id="notices" label="Notices" icon={<FaBullhorn />} />
             <NavButton id="profile" label="Profile" icon={<FaUser />} />
           </div>
@@ -60,17 +64,16 @@ const StudentDashboard = () => {
               </div>
             </div>
 
-            {/* Recent Notices Preview (Mini) */}
+            {/* Recent Notices & Feedback */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="bg-white p-6 rounded shadow border-l-4 border-yellow-500">
                   <h3 className="font-bold text-gray-700 mb-2 flex items-center gap-2">
                      <FaBullhorn className="text-yellow-500" /> Latest Notice
                   </h3>
-                  <p className="text-sm text-gray-500">Check the Notices tab for full details.</p>
-                  <button onClick={() => setActiveTab('notices')} className="text-blue-600 text-sm font-bold mt-2 hover:underline">View All</button>
+                  <p className="text-sm text-gray-500 mb-2">Check the Notices tab for full details on upcoming events.</p>
+                  <button onClick={() => setActiveTab('notices')} className="text-blue-600 text-sm font-bold hover:underline">View All</button>
                </div>
                
-               {/* Quick Feedback */}
                <FeedbackForm />
             </div>
           </div>
@@ -83,14 +86,28 @@ const StudentDashboard = () => {
           </div>
         )}
 
-        {/* --- TAB 3: NOTICES --- */}
+        {/* --- TAB 3: ROOM HUB --- */}
+        {activeTab === 'room' && (
+          <div className="animate-fade-in">
+             <RoomHub />
+          </div>
+        )}
+
+        {/* --- TAB 4: LEAVES (New) --- */}
+        {activeTab === 'leaves' && (
+          <div className="animate-fade-in">
+             <LeaveRequest />
+          </div>
+        )}
+
+        {/* --- TAB 5: NOTICES --- */}
         {activeTab === 'notices' && (
           <div className="animate-fade-in">
              <StudentNoticeBoard />
           </div>
         )}
 
-        {/* --- TAB 4: PROFILE --- */}
+        {/* --- TAB 6: PROFILE --- */}
         {activeTab === 'profile' && (
           <div className="animate-fade-in">
              <StudentProfile />

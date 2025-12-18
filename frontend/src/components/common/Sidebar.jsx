@@ -32,8 +32,8 @@ const Sidebar = () => {
         {/* STUDENT LINKS */}
         {user?.role === 'student' && (
           <>
-            <NavItem to="/student" icon={<FaUtensils />} label="Meals & Booking" />
-            <NavItem to="/student/attendance" icon={<FaQrcode />} label="Attendance & QR" />
+            <NavItem to="/student" icon={<FaUtensils />} label="Student Dashboard" />
+            {/* <NavItem to="/student/attendance" icon={<FaQrcode />} label="Attendance & QR" /> */}
           </>
         )}
 
@@ -48,7 +48,7 @@ const Sidebar = () => {
         {/* ADMIN LINKS */}
         {user?.role === 'admin' && (
           <>
-            <NavItem to="/admin" icon={<FaUser />} label="User Management" />
+            <NavItem to="/admin" icon={<FaUser />} label="Admin Dashboard" />
           </>
         )}
       </nav>

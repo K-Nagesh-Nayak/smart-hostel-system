@@ -9,7 +9,6 @@ const generateToken = (id) => {
 // @desc    Register a new student
 // @route   POST /api/auth/register
 export const registerUser = async (req, res) => {
-  // Extract new fields
   const { name, email, password, room, phone, guardianName } = req.body;
 
   try {
@@ -21,13 +20,12 @@ export const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create user with new fields
     const user = await User.create({
       name,
       email,
       passwordHash,
       role: 'student',
-      approved: false, // Must be approved by Admin
+      approved: false, 
       room,
       phone,
       guardianName
@@ -39,6 +37,7 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        room: user.room, // Include room here too just in case
         token: generateToken(user._id),
       });
     }
@@ -47,6 +46,49 @@ export const registerUser = async (req, res) => {
   }
 };
 
+// @desc    Auth user & get token
+// @route   POST /api/auth/login
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user && (await bcrypt.compare(password, user.passwordHash))) {
+      if (user.role === 'student' && !user.approved) {
+        return res.status(403).json({ message: 'Account not approved by Admin yet.' });
+      }
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        room: user.room, // <-- FIX 1: Add room here
+        phone: user.phone, // Useful for profile
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get current user profile
+// @route   GET /api/auth/me
+export const getMe = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    room: user.room, // <-- FIX 2: Add room here
+    phone: user.phone
+  });
+};
+
+// @desc    Change Password
+// @route   PUT /api/auth/change-password
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   try {
@@ -63,38 +105,4 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
-
-// ... Keep loginUser and getMe as they were ...
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (user && (await bcrypt.compare(password, user.passwordHash))) {
-      if (user.role === 'student' && !user.approved) {
-        return res.status(403).json({ message: 'Account not approved by Admin yet.' });
-      }
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getMe = async (req, res) => {
-  const user = await User.findById(req.user._id);
-  res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
 };
